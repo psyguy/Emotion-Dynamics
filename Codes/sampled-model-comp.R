@@ -20,7 +20,7 @@ for(sampled in sampled.names){
   name <- sampled.mirt$name
   round <- sampled.mirt$round
   outcomes[round, name] <- sampled.mirt %>% my.mirt.comparison(criterion = criterion)
-  sampled.mirt$model %>% l_ply(summary)
+  # sampled.mirt$model %>% l_ply(summary)
 }
 
 getwd()

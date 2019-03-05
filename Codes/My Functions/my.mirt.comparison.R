@@ -10,7 +10,7 @@ my.mirt.comparison <- function(sampled.mirt, criterion = "BIC"){
   m <- min(values)
   
   ind <- which(values == min(values), arr.ind=TRUE)
-  best <- rownames(values)[ind[2]]
+  best <- rownames(values)[ind[1]]
   
   return(best)
   

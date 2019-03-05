@@ -1,9 +1,19 @@
+---
+title: "Untitled"
+author: "Manuel Haqiqatkhah"
+date: "March 5, 2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
 # Multi-dimensional IRT and Multi-dimensional Constructs for Emotions {#mirt}
 
 
 Here I present what I've done with `mirt`.
 
-```{r, include=TRUE, echo=TRUE}
+```{r, include=TRUE}
 #, code = readLines("../Codes/sampled-model-comp.R")}
 library(mirt)
 library(plyr)

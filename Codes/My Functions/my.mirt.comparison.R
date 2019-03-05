@@ -1,6 +1,6 @@
 my.mirt.comparison <- function(sampled.mirt, criterion = "BIC"){
   
-  model.fit <- sampled.mirt$model[-1]
+  model.fit <- sampled.mirt$model#[-1]
   fit.temp <- model.fit %>% ldply(anova)
   fit.abs <- fit.temp[,-1] %>% abs()
   rownames(fit.abs) <- fit.temp[,1]
@@ -9,7 +9,7 @@ my.mirt.comparison <- function(sampled.mirt, criterion = "BIC"){
   values <- fit.abs %>% select(criterion)
   m <- min(values)
   
-  ind <- which(values == max(values), arr.ind=TRUE)
+  ind <- which(values == min(values), arr.ind=TRUE)
   best <- rownames(values)[ind[2]]
   
   return(best)

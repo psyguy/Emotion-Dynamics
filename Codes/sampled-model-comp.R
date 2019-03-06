@@ -1,7 +1,7 @@
-source("./Codes/My Functions/my.library.loader.R")
+source("./Codes/My-Functions/my.library.loader.R")
 
-sampled.path <- "./Processed data/sampled mirt models"
-sampled.names <- list.files(path = sampled.path, pattern = "*.RData")
+sampled.path <- "../Emotion Dynamics 1/ED 1 - Codes/3-mirt-Model-Comp/Processed-457/1persons.0days.0beeps/"
+sampled.names <- list.files(path = sampled.path)#, pattern = "*.RData")
 
 
 list.of.names <- list('CLINICAL ESM','Cogito','ELISE ESM14', 'JULIAN EGON',
@@ -11,16 +11,17 @@ list.of.names <- list('CLINICAL ESM','Cogito','ELISE ESM14', 'JULIAN EGON',
                       'PETEMADDY')
 
 
-outcomes <- data.frame(matrix(ncol = 15, nrow = 1))
-colnames(outcomes) <- list.of.names
+outcomes <- data.frame(matrix(nrow = 0, ncol = 8))
+# colnames(outcomes) <- list.of.names
 
-criterion <- "HQ"
+t <- Sys.time()
 for(sampled in sampled.names){
-  load(paste0("./Processed data/sampled mirt models/", sampled, sep = ""))
-  name <- sampled.mirt$name
-  round <- sampled.mirt$round
-  outcomes[round, name] <- sampled.mirt %>% my.mirt.comparison(criterion = criterion)
-  # sampled.mirt$model %>% l_ply(summary)
+  load(paste0(sampled.path, sampled, sep = ""))
+  outcome.single <- to.be.saved %>% my.mirt.comparison
+  outcomes <- outcome.single %>% rbind(outcomes)
 }
+Sys.time() - t
+
+outcomes %>% my.vote.plotter()
 
 getwd()

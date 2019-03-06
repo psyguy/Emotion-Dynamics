@@ -8,7 +8,7 @@ l_ply(list.of.packages, require, character.only = TRUE)
 
 knitr::write_bib(c(.packages(), list.of.packages), 'packages.bib')
 
-function.path <- "./Codes/My Functions/"
+function.path <- "./Codes/My-Functions/"
 
 my.scripts <- list.files(path = function.path, pattern = "*.R")
 my.scripts <- my.scripts[my.scripts!="my.library.loader.R"]

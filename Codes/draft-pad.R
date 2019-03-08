@@ -47,4 +47,8 @@ ggplot(data, aes(x=Stars, fill = Condition, group = Condition)) + geom_bar(aes(y
 # filter(AIC != "def.E.bare")
 
 
+m <- to.be.saved$model$def.C.cov
+m %>% itemplot(c(1:3), "info")#item = c(1:3), type = "SE")
+
+
 

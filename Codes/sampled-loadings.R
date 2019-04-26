@@ -29,31 +29,33 @@ loadings <- def.colnames %>%
                       colnames(df) <- c("name.dataset", "name.model", "item", "seed", x)
                       })
 
-extract.append <- function(loadings, model, name.model){
+extract.append <- function(prev.loadings, model, name.model, name.dataset){
   
   ls.and.h2 <- model@Fit$F %>% cbind(model@Fit$h2)
   colnames(ls.and.h2)[ncol(ls.and.h2)] <- "h2"
   
-  name.model <- names(list.of.models)[i] %>% rep(nrow(ls.and.h2))
+  name.model <- name.model %>% rep(nrow(ls.and.h2))
   item <- rownames(ls.and.h2)
   seed <- seed %>% rep(nrow(ls.and.h2))
+  
   name.dataset <- name.dataset %>% rep(nrow(ls.and.h2))
+  
   single.case <- cbind(name.dataset, name.model, item, seed, ls.and.h2)
   rownames(single.case) <- c()
   
-  already.there <- loadings[[i]]
-  rownames(already.there) <- c()
-  loadings[[i]] <- rbind(already.there, single.case)
-  rownames(loadings[[i]]) <- c()
+  rownames(prev.loadings) <- c()
+  out <- rbind(prev.loadings, single.case)
+  rownames(out) <- c()
+  out %>% return()
 }
 
 
-sampled <- sampled.names[10]
-
-
+# sampled <- sampled.names[10]
 
 t <- Sys.time()
 j <- 1
+
+def.C.cov <- matrix(nrow = 0, ncol = (4+4)) %>% data.frame()
 for(sampled in sampled.names){
   load(paste(sampled.path, sampled, sep = ""))
   name.dataset <- to.be.saved$name
@@ -62,28 +64,12 @@ for(sampled in sampled.names){
   print(j)
   j <- j + 1
   
-  for(i in 1:2){ #length(list.of.models)
-    
-    model <- list.of.models[[i]]
-    
-    ls.and.h2 <- model@Fit$F %>% cbind(model@Fit$h2)
-    colnames(ls.and.h2)[ncol(ls.and.h2)] <- "h2"
-    
-    name.model <- names(list.of.models)[i] %>% rep(nrow(ls.and.h2))
-    item <- rownames(ls.and.h2)
-    seed <- seed %>% rep(nrow(ls.and.h2))
-    name.dataset <- name.dataset %>% rep(nrow(ls.and.h2))
-    single.case <- cbind(name.dataset, name.model, item, seed, ls.and.h2)
-    rownames(single.case) <- c()
-    
-    already.there <- loadings[[i]]
-    rownames(already.there) <- c()
-    loadings[[i]] <- rbind(already.there, single.case)
-    rownames(loadings[[i]]) <- c()
-    # already.there <- eval(parse(text = paste0("loadings$",name.model)))
-    # eval(parse(text = paste0("loadings$",name.model))) <- rbind(already.there, single.case)
+  # for(i in 1:2){ #length(list.of.models)
+
+    def.C.cov <- extract.append(prev.loadings = def.C.cov, model = list.of.models[[5]],
+                   name.model = names(list.of.models)[5],
+                   name.dataset)
   }
-}
 Sys.time() - t
 
 

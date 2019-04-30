@@ -1,7 +1,10 @@
 rm(list=ls())
 source("./Codes/My-Functions/my.library.loader.R")
 
-sampled.path <- "../Emotion Dynamics 1/ED 1 - Codes/3. mirt-Model-Comp/Processed-457/1persons.0days.0beeps/"
+# within:
+# sampled.path <- "../Emotion Dynamics 1/ED 1 - Codes/3. mirt-Model-Comp/Processed-457/1persons.0days.0beeps/"
+
+#between
 sampled.path <- "../Emotion Dynamics 1/ED 1 - Codes/3. mirt-Model-Comp/Processed-457/0persons.0days.1beeps/"
 
 sampled.names <- list.files(path = sampled.path, pattern = "*.RData")
@@ -23,13 +26,10 @@ def.colnames <- list(def.A = c("Communal", "h2"),
                      def.E.cov = c("F1", "F2", "F3", "h2")
                      )
 
-loadings <- def.colnames %>%
-              llply(function(x){
-                      df <- matrix(nrow = 0, ncol = (4+length(x))) %>% data.frame()
-                      colnames(df) <- c("name.dataset", "name.model", "item", "seed", x)
-                      })
+loadings <- def.colnames %>% llply(function(x) c())
 
-extract.append <- function(prev.loadings, model, name.model, name.dataset){
+extract.append <- function(prev.loadings, model,
+                           name.model, name.dataset, seed){
   
   ls.and.h2 <- model@Fit$F %>% cbind(model@Fit$h2)
   colnames(ls.and.h2)[ncol(ls.and.h2)] <- "h2"
@@ -49,27 +49,39 @@ extract.append <- function(prev.loadings, model, name.model, name.dataset){
   out %>% return()
 }
 
+make.loadings <- function(num.cols, name.model, m){
+  
+  j <- 1
+  loadings.temp <- matrix(nrow = 0, ncol = (4+num.cols)) %>% data.frame()
+  
+  for(sampled in sampled.names){
+    
+    load(paste(sampled.path, sampled, sep = ""))
+    
+    name.dataset <- to.be.saved$name
+    # list.of.models <- to.be.saved$model
+    model <- to.be.saved$model[[m]]
+    seed <- to.be.saved$parameters$seed
+    print(paste("definition", m, "sample", j))
+    j <- j + 1
+    
+    loadings.temp <- extract.append(prev.loadings = loadings.temp,
+                                    model = model,
+                                    name.model = name.model,
+                                    name.dataset = name.dataset,
+                                    seed)
+  }
+  loadings.temp %>% return()
+}
 
-# sampled <- sampled.names[10]
 
 t <- Sys.time()
-j <- 1
-
-def.C.cov <- matrix(nrow = 0, ncol = (4+4)) %>% data.frame()
-for(sampled in sampled.names){
-  load(paste(sampled.path, sampled, sep = ""))
-  name.dataset <- to.be.saved$name
-  list.of.models <- to.be.saved$model
-  seed <- to.be.saved$parameters$seed
-  print(j)
-  j <- j + 1
+for(m in 1:length(def.colnames)){
+  name.model <- names(def.colnames)[m]
+  num.cols <- def.colnames[[m]] %>% length()
   
-  # for(i in 1:2){ #length(list.of.models)
-
-    def.C.cov <- extract.append(prev.loadings = def.C.cov, model = list.of.models[[5]],
-                   name.model = names(list.of.models)[5],
-                   name.dataset)
-  }
+  loadings[[m]] <- make.loadings(num.cols, name.model, m)
+}
 Sys.time() - t
 
-
+# save(loadings, file = "loadings.between.RData")

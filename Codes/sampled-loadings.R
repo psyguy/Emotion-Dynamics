@@ -2,10 +2,10 @@ rm(list=ls())
 source("./Codes/My-Functions/my.library.loader.R")
 
 # within:
-# sampled.path <- "../Emotion Dynamics 1/ED 1 - Codes/3. mirt-Model-Comp/Processed-457/1persons.0days.0beeps/"
+sampled.path <- "../Emotion Dynamics 1/ED 1 - Codes/3. mirt-Model-Comp/Processed-457/1persons.0days.0beeps/"
 
 #between
-sampled.path <- "../Emotion Dynamics 1/ED 1 - Codes/3. mirt-Model-Comp/Processed-457/0persons.0days.1beeps/"
+# sampled.path <- "../Emotion Dynamics 1/ED 1 - Codes/3. mirt-Model-Comp/Processed-457/0persons.0days.1beeps/"
 
 sampled.names <- list.files(path = sampled.path, pattern = "*.RData")
 
@@ -83,5 +83,5 @@ for(m in 1:length(def.colnames)){
   loadings[[m]] <- make.loadings(num.cols, name.model, m)
 }
 Sys.time() - t
-
-# save(loadings, file = "loadings.between.RData")
+loadings.between <- loadings
+# save(loadings.between, file = "loadings.between.RData")

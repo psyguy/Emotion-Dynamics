@@ -5,8 +5,8 @@ my.loadings.plotter <- function(d, name.dataset, wbp){
   # loadings.list <- loadings
   # loading.element <- loadings.list[[5]] -> d
   
-  d <- loadings.between$def.A
-  name.dataset <- list.of.names[[1]]
+  # d <- loadings.between$def.A
+  # name.dataset <- list.of.names[[1]]
   
   colnames(d)[1:2] <- c("dataset name", "model definition")
   # d <- d %>% filter(`dataset name` == name.dataset)#"MDD BPD TRULL")#|`dataset name` =="MDD BPD TRULL")
@@ -35,17 +35,17 @@ my.loadings.plotter <- function(d, name.dataset, wbp){
     ylab <- paste("Factor loading of", name.factor)
     ylim <- c(-1,1)
     threshold <- c(0.6,-0.6)
-    # if(name.factor=="h2"){
-    #   ylab <- paste("Communality of items")
-    #   ylim <- c(0,1)
-    #   threshold <- 0.6}
+    if(name.factor=="h2"){
+      ylab <- paste("Communality of items")
+      ylim <- c(0,1)
+      threshold <- 0.6}
 
-    # paste(wbp, name.dataset, def, name.factor, "png", sep = ".") %>% png()
-    par(las=1)
-    pirateplot(formula = factor ~ `dataset name` + item,
+    paste(wbp, name.dataset, def, name.factor, "png", sep = ".") %>% png()
+    par(las=2)
+    pirateplot(formula = factor ~ item, #`dataset name` + 
                main = plot.title,
                cap.beans = F,
-               width.max = .1,
+               # width.max = .1,
                data = dd,           
                ylim = ylim,
                ylab = ylab,
@@ -56,7 +56,7 @@ my.loadings.plotter <- function(d, name.dataset, wbp){
                inf.disp = "line" # or "line"
                )
     abline(h = threshold, col = "red", lty=2, lwd=3)
-    # dev.off()
+    dev.off()
   }
   
 }
@@ -65,8 +65,8 @@ my.loadings.plotter <- function(d, name.dataset, wbp){
 for(dataset in list.of.names){
   print(dataset)
   print("within")
-  loadings.within %>% l_ply(my.loadings.plotter, dataset, "W")
+  corrected.loadings.within %>% l_ply(my.loadings.plotter, dataset, "C.W")
   print("now between")
-  loadings.between %>% l_ply(my.loadings.plotter, dataset, "B")
+  corrected.loadings.between %>% l_ply(my.loadings.plotter, dataset, "C.B")
 }
 

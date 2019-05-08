@@ -1,10 +1,12 @@
 # source("https://bioconductor.org/biocLite.R")
 # biocLite("ComplexHeatmap")
 
-# library(devtools)
-# install_github("jokergoo/ComplexHeatmap")
+library(devtools)
+install_github("jokergoo/ComplexHeatmap")
 library(ComplexHeatmap)
-
+library(dplyr)
+library(plyr)
+library(tidyverse)
 # rm(list=ls())
 
 load("I:/Emotion Dynamics Clean/corrected.loadings.within.RData")
@@ -29,7 +31,11 @@ l.w <- l.w %>% llply(quick.correct)
 rm(list=setdiff(ls(), c("l.b","l.w")))
 
 
-my.heatmap.plotter <- function(l, which = "factors", what = "mean"){
+
+
+# DensityHeatmap for factors ----------------------------------------------
+
+# my.heatmap.plotter <- function(l, which = "factors", what = "mean"){
   l <- l.b[1]
   d <- l[[1]]
   
@@ -47,9 +53,6 @@ my.heatmap.plotter <- function(l, which = "factors", what = "mean"){
     }
   }
   
-  # di[di %in% lookup.table$items.original == TRUE] <-
-  #   items.prefixed[lookup.table$items.original %in% di == TRUE]
-  # 
   d$item <- di# %>% as.factor()
   
   datasets <- d$`dataset name` %>% as.character() %>% unique()
@@ -74,21 +77,42 @@ my.heatmap.plotter <- function(l, which = "factors", what = "mean"){
   
   d$Communal <- d$Communal %>% as.character() %>% as.numeric()
   d$h2 <- d$h2 %>% as.character() %>% as.numeric()
+  d$item <- d$item %>% as.character()
   d.long <- d %>% mutate(itemXdataset = paste(item, `dataset name`, sep = ".")) %>%
     select(itemXdataset, seed, Communal)
+  itemXdataset <- d.long$itemXdataset %>% as.character() %>% unique()
+  
+  all.itemXall.datasets = paste(rep(items.prefixed,12), rep(datasets,13), sep=".")
+  empty.cols <- setdiff(all.itemXall.datasets, itemXdataset) #
+  
+  empty.wide <- matrix(-10, nrow = nrow(d.wide), ncol = length(empty.cols)) %>% as.data.frame()
+  empty.wide <- c(1:100) %>% cbind(empty.wide)
+  colnames(empty.wide) <- c("seed",empty.cols)
+  
+  empty.long <- empty.wide %>% 
+    gather("itemXdataset", "Communal", 2:69) %>% 
+    select(colnames(d.long))
+  
+  d.long <- d.long %>% rbind(empty.long) %>% arrange(itemXdataset)
   
   d.wide <- d.long %>% spread(itemXdataset, Communal) %>% select(-seed)
   
-  # i <- d.long$itemXdataset[12]
-  # x <- d.long %>% filter(itemXdataset==i)
   
-  labels <- d.wide %>% colnames() %>% strsplit("\\.") %>% llply(function(x) x[2]) %>% unlist
   
-  # for(i in d.long$itemXdataset){
-  #   
-  #  }
   
-  d.wide %>% densityHeatmap()#(anno = labels)
+  # d.wide <- d.wide %>% cbind(empty.wide)
+  
+  labels <- d.wide %>% colnames() %>% 
+            strsplit("\\.") %>% llply(function(x) paste(x[1],x[2], sep=".")) %>% unlist
+  
+  
+  d.wide %>% densityHeatmap(show_column_names = F,
+                            show_quantiles = F,
+                            ylim = c(-1,1),
+                            # cluster_columns = T,
+                            column_split = labels)#(anno = labels)
+  # grid.text("outlier", 1.5/10, 2.5/4, default.units = "npc")
+  grid.lines(c(0.25, 0.25), c(0, 1), gp = gpar(lty = 2, lwd = 2, col = "white"))
   
   
   for(item in 1:length(factors)){
@@ -105,7 +129,6 @@ my.heatmap.plotter <- function(l, which = "factors", what = "mean"){
     # new.fac.loadings <- new.fac.loadings %>% cbind(fac.loadings)
     d[,f] <- new.fac.loadings
   } 
-}
 
 
 # Complex heatmap examples ----------------------------------------------------------

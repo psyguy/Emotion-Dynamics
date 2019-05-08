@@ -78,13 +78,30 @@ Heatmap(mat, name = "mat",
 ha_column1 = HeatmapAnnotation(points = anno_points(rnorm(10)), 
                                annotation_name_side = "left")
 
-(ht1 = Heatmap(mat, name = "ht1", km = 2, column_km = 2, column_title = "Heatmap 1", 
-               top_annotation = ha_column1, row_names_side = "left"))
+(ht1 = Heatmap(mat, name = "ht1",
+               column_title = "Heatmap 1",
+               row_split = c(rep("A", 3), rep("B",9)),
+               show_row_dend = F,
+               show_column_dend = F))
 
 decorate_heatmap_body("ht1", {
   grid.text("outlier", 1.5/10, 2.5/4, default.units = "npc")
   grid.lines(c(0.5, 0.5), c(0, 1), gp = gpar(lty = 2, lwd = 2))
 }, slice = 2)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 decorate_row_names("ht1", {
@@ -95,9 +112,9 @@ decorate_row_title("ht1", {
   grid.rect(gp = gpar(fill = "#00FF0040"))
 }, slice = 1)
 
-decorate_annotation("points", {
-  grid.lines(c(0, 1), unit(c(0, 0), "native"), gp = gpar(col = "red"))
-})
+# decorate_annotation("points", {
+#   grid.lines(c(0, 1), unit(c(0, 0), "native"), gp = gpar(col = "red"))
+# })
 
 
 # https://www.r-graph-gallery.com/2d-density-plot-with-ggplot2/ -----------

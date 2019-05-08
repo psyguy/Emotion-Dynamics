@@ -3,6 +3,8 @@ quick.correct <- function(x, dropped.data.set = "TGC"){
   x$item <- x$item %>% toupper()
   x$item[x$item == "STRESS"] <- "STRESSED"
   x$item[x$item == "ANGER"] <- "ANGRY"
+  x[x == 0] <- -10
+  
   if(dropped.data.set == "TGC"){
     dropped.data.set <- c('MDD BPD TRULL', 'MDD GOTLIB', 'Cogito')}
   if(!is.null(dropped.data.set)){

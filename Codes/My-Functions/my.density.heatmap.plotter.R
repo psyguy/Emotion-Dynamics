@@ -1,9 +1,17 @@
 library(gridExtra)
 
 my.density.heatmap.plotter <- function(l, which = "h2", cluster.what = c("items", "datasets")){
-  # l <- l.b[1]
+
+# debugging inits ---------------------------------------------------------
+  
+  l <- l.b[2]
+  which <- "Pos"
+  cluster.what <- "items"
+  
+
+# start of the function ---------------------------------------------------
+  
   d <- l[[1]]
-  # which <- "Communal"
   ylim <- c(-1,1)
   if(which == "h2") ylim <- c(0,1)
   
@@ -63,7 +71,7 @@ my.density.heatmap.plotter <- function(l, which = "h2", cluster.what = c("items"
 
 # building the d.long matrix and labels -----------------------------------
 
-  empty.wide <- matrix(-10, nrow = nrow(d.wide), ncol = length(empty.cols)) %>%
+  empty.wide <- matrix(-10, nrow = 100, ncol = length(empty.cols)) %>%
                   as.data.frame()
   empty.wide <- c(1:100) %>% cbind(empty.wide)
   colnames(empty.wide) <- c("seed",empty.cols)
@@ -82,32 +90,42 @@ my.density.heatmap.plotter <- function(l, which = "h2", cluster.what = c("items"
     strsplit("\\.") %>% llply(my.label.extractor) %>% unlist()
   
 
-# plotting the density histogram ------------------------------------------
+# plotting the density heatmap ------------------------------------------
 
-  # ha1 = HeatmapAnnotation(foo=labels,
-  #                         show_legend=2)
-  #dist = c(rep("rnorm", 10), rep("runif", 10)))
-  # ha1 = HeatmapAnnotation(dist = labels,
-  #                         show_annotation_name=F)
-  # HeatmapAnnotation(foo = anno_block(gp = gpar(fill = 1:length(unique(labels))),
- 
-  hm.height <- 500
+  hm.height <- 600
+  hm.width <- 1500
   if(which == "h2") hm.height <- hm.height/2
   
   file.name <- paste(names(l), which, cluster.what, "png", sep = ".")
-  file.name %>% png(width = 1000, height = hm.height)
-  hm <- d.wide %>% densityHeatmap(show_column_names = F,
+  file.name <- paste(which, "png", sep = ".")
+  file.name %>% png(width = hm.width, height = hm.height)
+  
+  plot.title <- 
+  hm <- d.wide %>% densityHeatmap(show_column_names = FALSE,
                             ylim = ylim,
-                            column_gap = unit(1, "mm"),
-                            ylab = "loading",
-                            column_title = paste0("Density heatmap of ", which),
-                            show_column_dend = F,
+                            column_gap = unit(3, "mm"),
+                            border = T,
+                            ylab = which,
+                            column_title = NULL,# "",# paste0("Density heatmap of ", which),
+                            show_column_dend = FALSE,
                             column_split = labels,
-                            show_quantiles = F)
+                            show_quantiles = FALSE)
   print(hm)
   # ggplot2::ggsave(file.name,hm)
   dev.off()
 }
+
+
+l.b[3] %>% my.density.heatmap.plotter("Pos")
+l.b[3] %>% my.density.heatmap.plotter("Neg")
+l.b[3] %>% my.density.heatmap.plotter("h2")
+
+
+
+
+
+
+
 
 plots <- list("def.A.Communal.items.png", "def.A.Communal.items.png") %>% 
   lapply(function(x){
@@ -115,8 +133,7 @@ plots <- list("def.A.Communal.items.png", "def.A.Communal.items.png") %>%
     grid::rasterGrob(img, interpolate = FALSE)
   })
 
-l.w[1] %>% my.density.heatmap.plotter("Communal")
-l.w[1] %>% my.density.heatmap.plotter("h2")
+
 
 plots <- list(heat.com,heat.h2)
 c.name <- paste0("cssc"," curves ","item.name",".png")

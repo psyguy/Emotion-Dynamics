@@ -1,9 +1,9 @@
+# source("https://bioconductor.org/biocLite.R")
+# biocLite("ComplexHeatmap")
+
 # library(devtools)
 # install_github("jokergoo/ComplexHeatmap")
 library(ComplexHeatmap)
-# 
-# source("https://bioconductor.org/biocLite.R")
-# biocLite("ComplexHeatmap")
 
 # rm(list=ls())
 
@@ -11,8 +11,8 @@ load("I:/Emotion Dynamics Clean/corrected.loadings.within.RData")
 load("I:/Emotion Dynamics Clean/corrected.loadings.between.RData")
 source("I:/Emotion Dynamics Clean/Codes/My-Functions/my.little.functions.R")
 
-l.b <- loadings.between #corrected.loadings.between
-l.w <- loadings.within #corrected.loadings.within
+l.b <- corrected.loadings.between #corrected.loadings.between
+l.w <- corrected.loadings.within #corrected.loadings.within
 
 dropped.data.set <- c('MDD BPD TRULL', 'MDD GOTLIB', 'Cogito')
 

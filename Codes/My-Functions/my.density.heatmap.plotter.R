@@ -1,7 +1,9 @@
+library(gridExtra)
+
 my.density.heatmap.plotter <- function(l, which = "h2", cluster.what = c("items", "datasets")){
-  l <- l.b[1]
+  # l <- l.b[1]
   d <- l[[1]]
-  which <- "Communal"
+  # which <- "Communal"
   ylim <- c(-1,1)
   if(which == "h2") ylim <- c(0,1)
   
@@ -69,8 +71,9 @@ my.density.heatmap.plotter <- function(l, which = "h2", cluster.what = c("items"
   empty.long <- empty.wide %>% 
     gather(itemXdataset, to.be.plotted, 2:69) %>% 
     select(colnames(d.long))
-  
+  empty.long$to.be.plotted <- empty.long$to.be.plotted %>% as.character()
   d.long <- d.long %>% rbind(empty.long) %>% arrange(itemXdataset)
+  d.long$to.be.plotted <- d.long$to.be.plotted %>% as.character() %>% as.numeric()
   
   d.wide <- d.long %>% spread(itemXdataset, to.be.plotted) %>% select(-seed)
   
@@ -81,13 +84,57 @@ my.density.heatmap.plotter <- function(l, which = "h2", cluster.what = c("items"
 
 # plotting the density histogram ------------------------------------------
 
-  d.wide %>% densityHeatmap(show_column_names = F,
-                            show_quantiles = F,
-                            ylim = c(-1,1),
-                            # cluster_columns = T,
-                            # top_annotation = labels,
-                            column_split = labels)#(anno = labels)
+  # ha1 = HeatmapAnnotation(foo=labels,
+  #                         show_legend=2)
+  #dist = c(rep("rnorm", 10), rep("runif", 10)))
+  # ha1 = HeatmapAnnotation(dist = labels,
+  #                         show_annotation_name=F)
+  # HeatmapAnnotation(foo = anno_block(gp = gpar(fill = 1:length(unique(labels))),
+ 
+  hm.height <- 500
+  if(which == "h2") hm.height <- hm.height/2
   
-  
-  
+  file.name <- paste(names(l), which, cluster.what, "png", sep = ".")
+  file.name %>% png(width = 1000, height = hm.height)
+  hm <- d.wide %>% densityHeatmap(show_column_names = F,
+                            ylim = ylim,
+                            column_gap = unit(1, "mm"),
+                            ylab = "loading",
+                            column_title = paste0("Density heatmap of ", which),
+                            show_column_dend = F,
+                            column_split = labels,
+                            show_quantiles = F)
+  print(hm)
+  # ggplot2::ggsave(file.name,hm)
+  dev.off()
 }
+
+plots <- list("def.A.Communal.items.png", "def.A.Communal.items.png") %>% 
+  lapply(function(x){
+    img <- as.raster(readPNG(x))
+    grid::rasterGrob(img, interpolate = FALSE)
+  })
+
+l.w[1] %>% my.density.heatmap.plotter("Communal")
+l.w[1] %>% my.density.heatmap.plotter("h2")
+
+plots <- list(heat.com,heat.h2)
+c.name <- paste0("cssc"," curves ","item.name",".png")
+c.name %>% ggplot2::ggsave(gridExtra::marrangeGrob(grobs=plots, nrow=2, ncol=1,
+                                                   top = paste0("\n","heyhey")))
+
+
+
+# writing names -----------------------------------------------------------
+# It's so hard that I give up! Will add the titles manually!
+
+items.sorted <- c("Angry", "Anxious", "Depressed", "Restless",
+                  "Sad", "Stressed", "Calm", "Cheerful",
+                  "Content", "Euphoric", "Excited", "Happy",
+                  "Relaxed")
+# loci <- ()
+
+# zx <- {grid.text("vv", 3/15, 6/10, default.units = "npc")
+#   grid.text("vv", 3.75/15, 6/10, default.units = "npc")}
+  
+

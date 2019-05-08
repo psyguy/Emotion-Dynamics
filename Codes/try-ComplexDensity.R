@@ -92,6 +92,18 @@ decorate_heatmap_body("ht1", {
 
 
 
+# GJSFKLSGJ;A -------------------------------------------------------------
+
+Heatmap(matrix(rnorm(100), 10), 
+        top_annotation = HeatmapAnnotation(foo = anno_block(gp = gpar(fill = 1:4),
+                                      labels_gp = gpar(col = "white", fontsize = 10))),
+        show_row_dend = F,
+        show_column_dend = F,# column_km = 3,
+        column_split = c(rep("a",4),rep("b",2),"d",rep("c",3)),
+        left_annotation = rowAnnotation(foo = anno_block(gp = gpar(fill = 2:4),
+                                                         labels = c("group1", "group2", "group3"), 
+                                                         labels_gp = gpar(col = "white", fontsize = 10))),
+        row_km = 3)
 
 
 

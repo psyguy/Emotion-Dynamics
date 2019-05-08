@@ -78,11 +78,11 @@ rm(list=setdiff(ls(), c("l.b","l.w")))
   d$Communal <- d$Communal %>% as.character() %>% as.numeric()
   d$h2 <- d$h2 %>% as.character() %>% as.numeric()
   d$item <- d$item %>% as.character()
-  d.long <- d %>% mutate(itemXdataset = paste(item, `dataset name`, sep = ".")) %>%
+  d.long <- d %>% mutate(itemXdataset = paste(`dataset name`, item, sep = ".")) %>%
     select(itemXdataset, seed, Communal)
   itemXdataset <- d.long$itemXdataset %>% as.character() %>% unique()
   
-  all.itemXall.datasets = paste(rep(items.prefixed,12), rep(datasets,13), sep=".")
+  all.itemXall.datasets = paste(rep(datasets,13), rep(items.prefixed,12), sep=".")
   empty.cols <- setdiff(all.itemXall.datasets, itemXdataset) #
   
   empty.wide <- matrix(-10, nrow = nrow(d.wide), ncol = length(empty.cols)) %>% as.data.frame()
@@ -103,7 +103,7 @@ rm(list=setdiff(ls(), c("l.b","l.w")))
   # d.wide <- d.wide %>% cbind(empty.wide)
   
   labels <- d.wide %>% colnames() %>% 
-            strsplit("\\.") %>% llply(function(x) paste(x[1],x[2], sep=".")) %>% unlist
+            strsplit("\\.") %>% llply(function(x) paste(x[1], sep=".")) %>% unlist
   
   
   d.wide %>% densityHeatmap(show_column_names = F,

@@ -1,12 +1,16 @@
 # rm(list=ls())
 load("I:/Emotion Dynamics Clean/loadings.within.RData")
 load("I:/Emotion Dynamics Clean/loadings.between.RData")
+source("I:/Emotion Dynamics Clean/Codes/My-Functions/my.little.functions.R")
 
-loadings.between <- loadings.between %>% llply(function(x){
+l.b <- loadings.between
+l.w <- loadings.within
+
+l.b <- l.b %>% llply(function(x){
   colnames(x)[1:2] <- c("dataset name", "model definition")
   return(x)})
 
-loadings.within <- loadings.within %>% llply(function(x){
+l.w <- l.w %>% llply(function(x){
   colnames(x)[1:2] <- c("dataset name", "model definition")
   return(x)})
 
@@ -57,8 +61,8 @@ my.loading.aligner <- function(l){
   }
 
 Sys.time()
-corrected.loadings.within <- loadings.within %>% llply(my.loading.aligner)
-corrected.loadings.between <- loadings.between %>% llply(my.loading.aligner)
+corrected.loadings.within <- l.w %>% llply(my.loading.aligner)
+corrected.loadings.between <- l.b %>% llply(my.loading.aligner)
 Sys.time()
 
 # save(corrected.loadings.within, file = "corrected.loadings.within.RData")

@@ -4,23 +4,20 @@ my.density.heatmap.plotter <- function(l, which = "h2", cluster.what = c("items"
 
 # debugging inits ---------------------------------------------------------
   
-  l <- l.b[2]
-  which <- "Pos"
-  cluster.what <- "items"
+  # l <- l.b[2]
+  # which <- "Pos"
+  # cluster.what <- "datasets" "items"
   
-
 # start of the function ---------------------------------------------------
   
   d <- l[[1]]
   ylim <- c(-1,1)
   if(which == "h2") ylim <- c(0,1)
-  
 
 # getting rid of unwanted stuff -------------------------------------------
 
   d <- d %>% select(`dataset name`, item, seed, which)
   colnames(d)[4] <- "to.be.plotted"
-  
 
 # extracting vectors needed later -----------------------------------------
   
@@ -33,7 +30,6 @@ my.density.heatmap.plotter <- function(l, which = "h2", cluster.what = c("items"
   items.prefixed <- c(rep("p.",3), rep("n.",6), rep("p.",4)) %>% paste0(items.original)
   lookup.table <- cbind(items.original, items.prefixed) %>% as.data.frame()
   
-
 # adding prefixes to items ------------------------------------------------
   
   for(i in 1:length(items.d)){
@@ -43,7 +39,6 @@ my.density.heatmap.plotter <- function(l, which = "h2", cluster.what = c("items"
   }
   d$item <- items.d
   
-
 # clustering appropriately ------------------------------------------------
 
   if(cluster.what== "items"){
@@ -68,7 +63,6 @@ my.density.heatmap.plotter <- function(l, which = "h2", cluster.what = c("items"
     my.label.extractor <- function(x) paste(x[1], sep=".")
   }
   
-
 # building the d.long matrix and labels -----------------------------------
 
   empty.wide <- matrix(-10, nrow = 100, ncol = length(empty.cols)) %>%
@@ -85,25 +79,23 @@ my.density.heatmap.plotter <- function(l, which = "h2", cluster.what = c("items"
   
   d.wide <- d.long %>% spread(itemXdataset, to.be.plotted) %>% select(-seed)
   
+# plotting the density heatmap ------------------------------------------
   
   labels <- d.wide %>% colnames() %>% 
     strsplit("\\.") %>% llply(my.label.extractor) %>% unlist()
   
-
-# plotting the density heatmap ------------------------------------------
-
   hm.height <- 600
   hm.width <- 1500
   if(which == "h2") hm.height <- hm.height/2
   
   file.name <- paste(names(l), which, cluster.what, "png", sep = ".")
   file.name <- paste(which, "png", sep = ".")
+  
   file.name %>% png(width = hm.width, height = hm.height)
   
-  plot.title <- 
   hm <- d.wide %>% densityHeatmap(show_column_names = FALSE,
                             ylim = ylim,
-                            column_gap = unit(3, "mm"),
+                            column_gap = unit(2, "mm"),
                             border = T,
                             ylab = which,
                             column_title = NULL,# "",# paste0("Density heatmap of ", which),
@@ -111,47 +103,73 @@ my.density.heatmap.plotter <- function(l, which = "h2", cluster.what = c("items"
                             column_split = labels,
                             show_quantiles = FALSE)
   print(hm)
-  # ggplot2::ggsave(file.name,hm)
   dev.off()
 }
 
 
-l.b[3] %>% my.density.heatmap.plotter("Pos")
-l.b[3] %>% my.density.heatmap.plotter("Neg")
-l.b[3] %>% my.density.heatmap.plotter("h2")
+my.together.plotter <- function(l, cluster.what = "items", wbp = "within"){
+# debugging inits ---------------------------------------------------------
+  
+  # l <- l.b[3]
+  # which <- "Pos"
+  # cluster.what <- "items"
 
+# start of the function ---------------------------------------------------
 
-
-
-
-
-
-
-plots <- list("def.A.Communal.items.png", "def.A.Communal.items.png") %>% 
-  lapply(function(x){
-    img <- as.raster(readPNG(x))
-    grid::rasterGrob(img, interpolate = FALSE)
-  })
-
-
-
-plots <- list(heat.com,heat.h2)
-c.name <- paste0("cssc"," curves ","item.name",".png")
-c.name %>% ggplot2::ggsave(gridExtra::marrangeGrob(grobs=plots, nrow=2, ncol=1,
-                                                   top = paste0("\n","heyhey")))
-
-
-
-# writing names -----------------------------------------------------------
-# It's so hard that I give up! Will add the titles manually!
-
-items.sorted <- c("Angry", "Anxious", "Depressed", "Restless",
-                  "Sad", "Stressed", "Calm", "Cheerful",
-                  "Content", "Euphoric", "Excited", "Happy",
-                  "Relaxed")
-# loci <- ()
-
-# zx <- {grid.text("vv", 3/15, 6/10, default.units = "npc")
-#   grid.text("vv", 3.75/15, 6/10, default.units = "npc")}
+  model.name <- l %>% names()
+  to.plot <- colnames(l[[1]])[-1:-4] %>% as.list()
   
 
+# making distribution density heatmaps ------------------------------------
+
+  to.plot %>% l_ply(function(x) my.density.heatmap.plotter(l, x, cluster.what))
+  
+  list.of.pngs <- to.plot %>% unlist() %>% c(cluster.what) %>% paste0(".png")
+
+
+
+# making title and file name ----------------------------------------------
+
+  file.name.together <- paste(model.name, wbp, cluster.what, "png", sep = ".")
+  plot.title <- paste(
+    # "Distribution of loadings and communalities of model",
+    "Distributions for model fit of",
+    model.name,
+    "on the",
+    wbp,
+    "person sample",
+    "clustered by",
+    cluster.what
+  )
+  
+# reading the saved plots and putting them together -----------------------
+
+  plots <- list.of.pngs %>% 
+    lapply(function(x){
+      img <- as.raster(readPNG(x))
+      grid::rasterGrob(img, interpolate = FALSE)
+    })
+  
+  # if(cluster.what == "items") last.hight <- 232
+  # if(cluster.what == "datasets") last.hight <- 390
+  
+  g <- marrangeGrob(grobs = plots,
+                    nrow = length(list.of.pngs),
+                    ncol = 1,
+                    heights = c(rep(600,length(to.plot)-1),300,232),
+                    widths = c(1500),
+                    top = paste0("\n", plot.title, "\n"),
+                    padding = unit(.5, "line"))
+  file.name.together %>% ggplot2::ggsave(g)
+  
+}
+
+
+Sys.time()
+for(c.w in c("items","datasets")){
+  paste("within", c.w) %>% print()
+  l.w %>% l_ply(my.together.plotter, cluster.what, "within")
+  paste("between", c.w) %>% print()
+  l.b %>% l_ply(my.together.plotter, cluster.what, "between")
+}
+Sys.time()

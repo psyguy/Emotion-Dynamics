@@ -52,3 +52,52 @@ m %>% itemplot(c(1:3), "info")#item = c(1:3), type = "SE")
 
 
 
+
+# May 8 -------------------------------------------------------------------
+
+# old crap plotting them together --------------------------------------------------
+
+
+
+plots <- list("Pos.png", "h2.png", "Neg.png", "inb.png") %>% 
+  lapply(function(x){
+    img <- as.raster(readPNG(x))
+    grid::rasterGrob(img, interpolate = FALSE)
+  })
+
+c.name <- paste0("again",".png")
+g <- marrangeGrob(grobs=plots, nrow=4, ncol=1,
+                  heights = c(600,300,600,145),
+                  widths = c(1500),#,1500,1500), 
+                  top = paste0("\n","meh"),
+                  padding = unit(.5, "line"))
+c.name %>% ggplot2::ggsave(g)
+
+
+pdf(file="meh.pdf")
+par(mfrow=c(3,1))
+readPNG("Pos.png")
+readPNG("h2.png")
+readPNG("Neg.png")
+dev.off() 
+
+
+
+# writing names -----------------------------------------------------------
+# It's so hard that I give up! Will add the titles manually!
+
+items.sorted <- c("Angry", "Anxious", "Depressed", "Restless",
+                  "Sad", "Stressed", "Calm", "Cheerful",
+                  "Content", "Euphoric", "Excited", "Happy",
+                  "Relaxed")
+# loci <- ()
+
+# zx <- {grid.text("vv", 3/15, 6/10, default.units = "npc")
+#   grid.text("vv", 3.75/15, 6/10, default.units = "npc")}
+
+
+
+
+
+
+

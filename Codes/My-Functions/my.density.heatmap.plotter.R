@@ -135,7 +135,7 @@ my.together.plotter <- function(l, cluster.what = "items", wbp = "within"){
     # "Distribution of loadings and communalities of model",
     "Distributions for model fit of",
     model.name,
-    "on the",
+    "on the \n",
     wbp,
     "person sample",
     "clustered by",
@@ -158,18 +158,41 @@ my.together.plotter <- function(l, cluster.what = "items", wbp = "within"){
                     ncol = 1,
                     heights = c(rep(600,length(to.plot)-1),300,232),
                     widths = c(1500),
-                    top = paste0("\n", plot.title, "\n"),
-                    padding = unit(.5, "line"))
+                    top = paste0("\n", plot.title),
+                    padding = unit(5, "mm"))
   file.name.together %>% ggplot2::ggsave(g)
   
 }
 
 
-Sys.time()
-for(c.w in c("items","datasets")){
-  paste("within", c.w) %>% print()
-  l.w %>% l_ply(my.together.plotter, cluster.what, "within")
-  paste("between", c.w) %>% print()
-  l.b %>% l_ply(my.together.plotter, cluster.what, "between")
+# plotting for all datastes -----------------------------------------------
+
+t <- Sys.time()
+for(i in 1:9){
+  for(cluster.what in c("items", "datasets")){
+    paste("Doing it for", names(l.w[i]), "for", cluster.what, "within") %>% print()
+    l.w[i] %>% my.together.plotter(cluster.what, "within")
+    paste("Doing it for", names(l.w[i]), "for", cluster.what, "between") %>% print()
+    l.b[i] %>% my.together.plotter(cluster.what, "between")
+  }
 }
-Sys.time()
+Sys.time() - t
+
+
+# graveyard ---------------------------------------------------------------
+
+# quick.func <- function(l, cluster.what, wbp){
+#   # if(!is.list(l)) l <- l %>% as.list()
+#   l %>% as.list() %>% my.together.plotter(cluster.what, wbp)
+# }
+# 
+# Sys.time()
+# for(clustered.by in c("items","datasets")){
+#   for(wbp in c("within","between")){
+#     paste("within", clustered.by) %>% print()
+#     l.w %>% l_ply(quick.func, clustered.by, "within")
+#     paste("between", clustered.by) %>% print()
+#     l.b %>% l_ply(quick.func, clustered.by, "between")
+#     }
+# }
+# Sys.time()

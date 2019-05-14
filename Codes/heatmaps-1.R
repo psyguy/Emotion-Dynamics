@@ -2,7 +2,7 @@
 # biocLite("ComplexHeatmap")
 
 library(devtools)
-install_github("jokergoo/ComplexHeatmap")
+# install_github("jokergoo/ComplexHeatmap")
 library(ComplexHeatmap)
 library(dplyr)
 library(plyr)

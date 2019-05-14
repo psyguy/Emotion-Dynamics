@@ -98,6 +98,7 @@ my.density.heatmap.plotter <- function(l, which = "h2", cluster.what = c("items"
                             column_gap = unit(2, "mm"),
                             border = T,
                             ylab = which,
+                            col = (RColorBrewer::brewer.pal(9, "Blues")),
                             column_title = NULL,# "",# paste0("Density heatmap of ", which),
                             show_column_dend = FALSE,
                             column_split = labels,
@@ -146,14 +147,14 @@ my.together.plotter <- function(l, cluster.what = "items", wbp = "within"){
 
   plots <- list.of.pngs %>% 
     lapply(function(x){
-      img <- as.raster(readPNG(x))
+      img <- as.raster(png::readPNG(x))
       grid::rasterGrob(img, interpolate = FALSE)
     })
   
   # if(cluster.what == "items") last.hight <- 232
   # if(cluster.what == "datasets") last.hight <- 390
   
-  g <- marrangeGrob(grobs = plots,
+  g <- gridExtra::marrangeGrob(grobs = plots,
                     nrow = length(list.of.pngs),
                     ncol = 1,
                     heights = c(rep(600,length(to.plot)-1),300,232),

@@ -18,6 +18,12 @@ list.of.names <- list('CLINICAL ESM','Cogito','ELISE ESM14', 'JULIAN EGON',
                       'MDD BPD TRULL', 'MDD GOTLIB', 'MTURK DAILY DIARY', 
                       'PETEMADDY')
 
+list.of.names <- list('CLINICAL ESM','ELISE ESM14', 'JULIAN EGON',
+                      'KATHLEEN STRESSKLINIEK', 'Laura ESM 2014','Laura ESM 2016',
+                      'LONGITUDINAL W1', 'LONGITUDINAL W2', 'LONGITUDINAL W3','MARLIES BPD',
+                       'MTURK DAILY DIARY', 
+                      'PETEMADDY')
+
 
 outcomes <- data.frame(matrix(nrow = 0, ncol = 8))
 # colnames(outcomes) <- list.of.names
@@ -30,7 +36,7 @@ for(sampled in sampled.names){
 }
 Sys.time() - t
 
-criterion.list <- c("AIC", "AICc", "SABIC", "HQ", "BIC", "logLik")
+criterion.list <- "AICc"#c("AIC", "AICc", "SABIC", "HQ", "BIC", "logLik")
 
 for(c in criterion.list){
   png(paste0(sample.name, "-", c, ".barplot.png"))

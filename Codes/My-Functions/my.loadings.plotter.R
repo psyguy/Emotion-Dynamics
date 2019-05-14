@@ -7,10 +7,12 @@ my.loadings.plotter <- function(d, name.dataset, wbp){
   
   # d <- loadings.between$def.A
   # name.dataset <- list.of.names[[1]]
+  d <- l.b$def.A
   
   colnames(d)[1:2] <- c("dataset name", "model definition")
   # d <- d %>% filter(`dataset name` == name.dataset)#"MDD BPD TRULL")#|`dataset name` =="MDD BPD TRULL")
-  d <- d %>% filter(`dataset name` =="CLINICAL ESM")#|`dataset name` =="PETEMADDY")
+  d <- d %>% filter(item == 'RELAXED')#"MDD BPD TRULL")#|`dataset name` =="MDD BPD TRULL")
+  # d <- d %>% filter(`dataset name` =="CLINICAL ESM")#|`dataset name` =="PETEMADDY")
   d.numeric <- d[,-1:-4] %>%
     lapply(function(x) as.numeric(as.character(x)))
   d <- d[,1:4] %>% cbind(d.numeric)
@@ -42,20 +44,26 @@ my.loadings.plotter <- function(d, name.dataset, wbp){
 
     paste(wbp, name.dataset, def, name.factor, "png", sep = ".") %>% png()
     par(las=2)
-    pirateplot(formula = factor ~ item, #`dataset name` + 
+    pirateplot(formula = factor ~ `dataset name`,
                main = plot.title,
                cap.beans = F,
-               # width.max = .1,
+               width.max = .21,
                data = dd,           
                ylim = ylim,
+               pal = gray(.1), # Dark gray palette
+               point.pch = 16,  # Point specifications...
+               point.col = "blue",
+               point.bg = "red",
                ylab = ylab,
                xlab = "",
                inf.method = 'sd',
                avg.line.fun = mean,
-               theme = 1,
+               point.o = .81, # Point opacity
+               bean.f.o = 0*.2, # Turn down bean filling
+               inf.f.o = 0*.8, # Turn up inf fillingtheme = 2,
                inf.disp = "line" # or "line"
                )
-    abline(h = threshold, col = "red", lty=2, lwd=3)
+    # abline(h = threshold, col = "red", lty=2, lwd=3)
     dev.off()
   }
   

@@ -166,19 +166,6 @@ my.together.plotter <- function(l, cluster.what = "items", wbp = "within"){
 }
 
 
-# plotting for all datastes -----------------------------------------------
-
-t <- Sys.time()
-for(i in 1:9){
-  for(cluster.what in c("items", "datasets")){
-    paste("Doing it for", names(l.w[i]), "for", cluster.what, "within") %>% print()
-    l.w[i] %>% my.together.plotter(cluster.what, "within")
-    paste("Doing it for", names(l.w[i]), "for", cluster.what, "between") %>% print()
-    l.b[i] %>% my.together.plotter(cluster.what, "between")
-  }
-}
-Sys.time() - t
-
 
 # graveyard ---------------------------------------------------------------
 

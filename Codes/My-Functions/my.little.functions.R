@@ -1,9 +1,137 @@
-quick.correct <- function(x, dropped.data.set = "TGC"){
+# extract fit measures from the folder of processed  --------
+
+my.fit.extractor <- function(sampled.path,
+                             # sampled.names,
+                         return.failed = FALSE){
+  
+  sampled.names <- list.files(path = sampled.path, pattern = "*.RData")
+  
+  outcomes <- data.frame(matrix(nrow = 0, ncol = 8))
+  failed.samples <- c()
+  
+  t <- Sys.time()
+  for(sampled in sampled.names){
+    load(paste(sampled.path, sampled, sep = ""))
+    if(!isS4(to.be.saved$model$def.A)){
+      failed.samples <- c(failed.samples, to.be.saved$name)
+      next()
+    }
+    outcome.single <- to.be.saved %>% my.mirt.comparison()
+    outcomes <- outcome.single %>% rbind(outcomes)
+  }
+  (Sys.time() - t) %>% print()
+  
+  return(outcomes)
+}
+
+# extract loadings/fit measures/etc. from the folder of processed  --------
+
+my.loading.extractor <- function(sampled.path,
+                             # sampled.names,
+                             return.failed = FALSE){
+
+  sampled.names <- list.files(path = sampled.path, pattern = "*.RData")# %>% head(100)
+
+  outcomes <- data.frame(matrix(nrow = 0, ncol = 8))
+  failed.samples <- c()
+  # colnames(outcomes) <- list.of.names
+  
+  t <- Sys.time()
+  for(sampled in sampled.names){
+    load(paste(sampled.path, sampled, sep = ""))
+    if(!isS4(to.be.saved$model$def.A)){
+      failed.samples <- c(failed.samples, to.be.saved$name)
+      next()
+    }
+    outcome.single <- to.be.saved %>% my.mirt.comparison()
+    outcomes <- outcome.single %>% rbind(outcomes)
+  }
+  Sys.time() - t
+  
+  def.colnames <- list(def.A = c("Communal", "h2"),
+                       def.B.bare = c("Pos", "Neg", "h2"),
+                       def.B.cov = c("Pos", "Neg", "h2"),
+                       def.C.bare = c("Communal", "Pos", "Neg", "h2"),
+                       def.C.cov = c("Communal", "Pos", "Neg", "h2"),
+                       def.D.bare = c("F1", "F2", "h2"),
+                       def.D.cov = c("F1", "F2", "h2"),
+                       def.E.bare = c("F1", "F2", "F3", "h2"),
+                       def.E.cov = c("F1", "F2", "F3", "h2")
+                       )
+  
+  loadings <- def.colnames %>% llply(function(x) c())
+  
+  extract.append <- function(prev.loadings, model,
+                             name.model, name.dataset, seed){
+    
+    ls.and.h2 <- model@Fit$F %>% cbind(model@Fit$h2)
+    colnames(ls.and.h2)[ncol(ls.and.h2)] <- "h2"
+    
+    name.model <- name.model %>% rep(nrow(ls.and.h2))
+    item <- rownames(ls.and.h2)
+    seed <- seed %>% rep(nrow(ls.and.h2))
+    
+    name.dataset <- name.dataset %>% rep(nrow(ls.and.h2))
+    
+    single.case <- cbind(name.dataset, name.model, item, seed, ls.and.h2)
+    rownames(single.case) <- c()
+    
+    rownames(prev.loadings) <- c()
+    out <- rbind(prev.loadings, single.case)
+    rownames(out) <- c()
+    out %>% return()
+  }
+  
+  make.loadings <- function(num.cols, name.model, m){
+    j <- 1
+    loadings.temp <- matrix(nrow = 0, ncol = (4+num.cols)) %>% data.frame()
+    
+    for(sampled in sampled.names){
+      
+      load(paste(sampled.path, sampled, sep = ""))
+      name.dataset <- to.be.saved$name
+      
+      if(!isS4(to.be.saved$model$def.A)) next()
+      
+      model <- to.be.saved$model[[m]]
+      seed <- to.be.saved$parameters$seed
+      print(paste("definition", m, "sample", j))
+      
+      j <- j + 1
+      
+      loadings.temp <- extract.append(prev.loadings = loadings.temp,
+                                      model = model,
+                                      name.model = name.model,
+                                      name.dataset = name.dataset,
+                                      seed)
+    }
+    loadings.temp %>% return()
+  }
+  
+  
+  t <- Sys.time()
+  for(m in 1:length(def.colnames)){
+    name.model <- names(def.colnames)[m]
+    num.cols <- def.colnames[[m]] %>% length()
+    
+    loadings[[m]] <- make.loadings(num.cols, name.model, m)
+  }
+  (Sys.time() - t) %>% print()
+  
+  return(loadings)
+}
+
+
+# correcting colnames, item names, dropping the three datasets ------------
+
+quick.correct <- function(x, is.loading = FALSE, dropped.data.set = "TGC"){
   colnames(x)[1:2] <- c("dataset name", "model definition")
-  x$item <- x$item %>% toupper()
-  x$item[x$item == "STRESS"] <- "STRESSED"
-  x$item[x$item == "ANGER"] <- "ANGRY"
-  x[x == 0] <- -10
+  if(is.loading){
+    x$item <- x$item %>% toupper()
+    x$item[x$item == "STRESS"] <- "STRESSED"
+    x$item[x$item == "ANGER"] <- "ANGRY"
+    x[x == 0] <- -10
+    }
   
   if(dropped.data.set == "TGC"){
     dropped.data.set <- c('MDD BPD TRULL', 'MDD GOTLIB', 'Cogito')}
@@ -13,4 +141,6 @@ quick.correct <- function(x, dropped.data.set = "TGC"){
   }
   return(x)
 }
+
+
 

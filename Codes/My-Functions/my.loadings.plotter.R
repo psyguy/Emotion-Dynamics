@@ -69,12 +69,12 @@ my.loadings.plotter <- function(d, name.dataset, wbp){
   
 }
 
-
-for(dataset in list.of.names){
-  print(dataset)
-  print("within")
-  corrected.loadings.within %>% l_ply(my.loadings.plotter, dataset, "C.W")
-  print("now between")
-  corrected.loadings.between %>% l_ply(my.loadings.plotter, dataset, "C.B")
-}
+# 
+# for(dataset in list.of.names){
+#   print(dataset)
+#   print("within")
+#   corrected.loadings.within %>% l_ply(my.loadings.plotter, dataset, "C.W")
+#   print("now between")
+#   corrected.loadings.between %>% l_ply(my.loadings.plotter, dataset, "C.B")
+# }
 

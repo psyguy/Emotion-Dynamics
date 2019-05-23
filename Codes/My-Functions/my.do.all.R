@@ -2,7 +2,7 @@ my.do.all <- function(technique){
   
 # reading appropriate samples ---------------------------------------------
   
-  technique <- "r.sameocc"
+  # technique <- "r.sameocc"
   
   path.to.processed <- "correct_processed-457_May22/"
   
@@ -19,34 +19,46 @@ my.do.all <- function(technique){
                         'MTURK DAILY DIARY', 
                         'PETEMADDY')
   
+  ## remove comments, it works
   f <- sampled.path %>% my.fit.extractor() %>%
-                        quick.correct(is.loading = FALSE)
-  ll <- sampled.path %>% my.loading.extractor()# %>%
-                        llply(quick.correct)
+                          quick.correct(is.loading = FALSE)
+  l <- sampled.path %>% my.loading.extractor() %>%
+                          llply(quick.correct, is.loading = TRUE) %>%
+                          llply(my.loading.aligner)
+  save(list = c("f","l"), file = paste0(technique,"_loadings.and.factors.RData"))
 
-  
   
   
 # plotting density heatmaps for all datastes -----------------------------------------------
   
   t <- Sys.time()
   for(i in 1:9){
-    for(cluster.what in c("items", "datasets")){
-      paste("Doing it for", names(l.w[i]), "for", cluster.what, "within") %>% print()
-      l.w[i] %>% my.together.plotter(cluster.what, "within")
-      paste("Doing it for", names(l.w[i]), "for", cluster.what, "between") %>% print()
-      l.b[i] %>% my.together.plotter(cluster.what, "between")
+    for(cluster.what in c("items")){#, "datasets")){
+      paste("Plotting density heatmaps for", names(l[i]), "for", cluster.what, technique) %>% print()
+      l[i] %>% my.together.plotter(cluster.what, technique)
+      # paste("Doing it for", names(l.w[i]), "for", cluster.what, "between") %>% print()
+      # l.b[i] %>% my.together.plotter(cluster.what, "between")
     }
   }
-  Sys.time() - t
+  (Sys.time() - t) %>% print()
   
   
   
-}
+  t <- Sys.time()
+  for(name in list.of.names){
+    l %>% l_ply(my.spaghetti.ploter, name, technique)
+    print(paste("Spaghetti of", name, technique, "is plotted"))
+  }
+  (Sys.time() - t) %>% print()
 
+}
 
 # correcting column names of outcomes matrix ------------------------------
 # 
 # l.w <- l.w %>% llply(function(x){
 #   colnames(x)[1:2] <- c("dataset name", "model definition")
 #   return(x)})
+
+
+# my.do.all("p.all")
+my.do.all("r.randocc")

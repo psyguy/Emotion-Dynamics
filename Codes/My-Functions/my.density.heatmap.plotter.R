@@ -4,9 +4,9 @@ my.density.heatmap.plotter <- function(l, which = "h2", cluster.what = c("items"
 
 # debugging inits ---------------------------------------------------------
   
-  # l <- l.b[2]
+  # l <- l[2]
   # which <- "Pos"
-  # cluster.what <- "datasets" "items"
+  cluster.what <- "items" # "datasets"
   
 # start of the function ---------------------------------------------------
   
@@ -19,6 +19,7 @@ my.density.heatmap.plotter <- function(l, which = "h2", cluster.what = c("items"
   d <- d %>% select(`dataset name`, item, seed, which)
   colnames(d)[4] <- "to.be.plotted"
 
+  
 # extracting vectors needed later -----------------------------------------
   
   datasets <- d$`dataset name` %>% as.character() %>% unique()
@@ -79,6 +80,8 @@ my.density.heatmap.plotter <- function(l, which = "h2", cluster.what = c("items"
   
   d.wide <- d.long %>% spread(itemXdataset, to.be.plotted) %>% select(-seed)
   
+  d.wide[is.na(d.wide)] <- -10
+  
 # plotting the density heatmap ------------------------------------------
   
   labels <- d.wide %>% colnames() %>% 
@@ -88,9 +91,9 @@ my.density.heatmap.plotter <- function(l, which = "h2", cluster.what = c("items"
   hm.width <- 1500
   if(which == "h2") hm.height <- hm.height/2
   
-  file.name <- paste(names(l), which, cluster.what, "png", sep = ".")
-  file.name <- paste(which, "png", sep = ".")
+  # file.name <- paste(which, "png", sep = ".")
   
+  file.name <- paste(names(l), which, cluster.what, "png", sep = ".")
   file.name %>% png(width = hm.width, height = hm.height)
   
   hm <- d.wide %>% densityHeatmap(show_column_names = FALSE,
@@ -113,7 +116,7 @@ my.together.plotter <- function(l, cluster.what = "items", wbp = "within"){
   
   # l <- l.b[3]
   # which <- "Pos"
-  # cluster.what <- "items"
+  cluster.what <- "items"
 
 # start of the function ---------------------------------------------------
 
@@ -136,9 +139,11 @@ my.together.plotter <- function(l, cluster.what = "items", wbp = "within"){
     # "Distribution of loadings and communalities of model",
     "Distributions for model fit of",
     model.name,
-    "on the \n",
+    # "on the \n",
+    "analyzed with \n",
     wbp,
-    "person sample",
+    # "person sample",
+    "technique,",
     "clustered by",
     cluster.what
   )

@@ -1,6 +1,6 @@
 library(plyr)
 
-list.of.packages <- c("tidyverse", "dplyr", "plyr", "mirt")
+list.of.packages <- c("tidyverse", "dplyr", "plyr", "mirt", "ComplexHeatmap")
 
 new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
 if(length(new.packages)){install.packages(new.packages)}

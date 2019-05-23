@@ -123,6 +123,7 @@ my.loading.extractor <- function(sampled.path,
 
 
 # correcting colnames, item names, dropping the three datasets ------------
+# correcting col names, item names, removing the 3 datasets ---------------
 
 quick.correct <- function(x, is.loading = FALSE, dropped.data.set = "TGC"){
   colnames(x)[1:2] <- c("dataset name", "model definition")
@@ -134,7 +135,8 @@ quick.correct <- function(x, is.loading = FALSE, dropped.data.set = "TGC"){
     }
   
   if(dropped.data.set == "TGC"){
-    dropped.data.set <- c('MDD BPD TRULL', 'MDD GOTLIB', 'Cogito')}
+    dropped.data.set <- c('MDD BPD TRULL', 'MDD GOTLIB', 'Cogito')
+    }
   if(!is.null(dropped.data.set)){
     x <- x %>% filter(!(`dataset name` %in% dropped.data.set))
     x$`dataset name` <- x$`dataset name` %>% as.character() %>% as.factor()
@@ -142,5 +144,101 @@ quick.correct <- function(x, is.loading = FALSE, dropped.data.set = "TGC"){
   return(x)
 }
 
+
+# spaghetti plot diagnosis ------------------------------------------------
+
+my.spaghetti.ploter <- function(d, name.dataset, wbp){
+  
+  # debugging ---------------------------------------------------------------
+  
+  # d <- l$def.B.bare
+  # name.dataset <- "PETEMADDY"# list.of.name
+  
+  # real thing --------------------------------------------------------------
+  
+  colnames(d)[1:2] <- c("dataset name", "model definition")
+  d <- d %>% filter(`dataset name` == name.dataset)
+  d.numeric <- d[,-1:-4] %>%
+    lapply(function(x) as.numeric(as.character(x)))
+  d <- d[,1:4] %>% cbind(d.numeric)
+  
+  for(i in 5:(ncol(d)-1)){
+    
+    name.factor <- colnames(d)[i]
+    def <- as.character(d$`model definition`[1])
+    
+    dd <- d %>% select(item, seed, (i)) # %>% filter(item %in% c("Happy", "Angry", "Sad"))
+    colnames(dd) <- c("item", "seed", "factor")
+    dd$factor <- dd$factor %>% as.character() %>% as.numeric()
+    
+    d.wide <- dd %>% spread(item, factor) %>% select(-seed)
+    d.wide[is.na(d.wide)] <- 0
+    
+    plot.title <- paste("Laodings of",
+                        name.factor,
+                        def,
+                        "for dataset",
+                        name.dataset
+    )
+    
+    ylab <- paste("Factor loading of", name.factor)
+    ylim <- c(-1,1)
+    threshold <- c(0.6,-0.6)
+    
+    g <- GGally::ggparcoord(d.wide,
+                            title = plot.title,
+                            # columns = c(1:8),
+                            # groupColumn = '',
+                            scale = 'globalminmax')
+    
+    paste(wbp, name.dataset, def, name.factor, "png", sep = ".") %>% png()
+    print(g)
+    dev.off()
+  }
+  
+}
+
+
+# correcting bimodality ---------------------------------------------------
+
+my.little.align <- function(d){
+  
+  items <- d$item %>% unique()
+  factors <- colnames(d)[5:(ncol(d)-1)]
+  d$seed <- d$seed %>% as.character() %>% as.numeric()
+  new.fac.loadings.all <- c()
+  for(n.f in 1:length(factors)){
+    # d.new <- d %>% pull(f) %>% as.character() %>% as.numeric()
+    f <- 4 + n.f
+    new.fac.loadings <- c()
+    for(s in 1:100){
+      fac.loadings <- d %>% filter(seed == s) %>%
+        pull(f) %>% as.character() %>% as.numeric()
+      first.sign <- (fac.loadings[fac.loadings!=0])[1] %>% sign()
+      fac.loadings <- fac.loadings*first.sign
+      new.fac.loadings <- new.fac.loadings %>% c(fac.loadings)
+    }
+    # new.fac.loadings <- new.fac.loadings %>% cbind(fac.loadings)
+    d[,f] <- new.fac.loadings
+  }
+  d %>% return()
+}
+
+
+my.loading.aligner <- function(l){
+  
+  # l <- loadings.list# <- loadings.within[[1]]
+  
+  names.datasets <- l$`dataset name` %>% unique() %>% as.character()
+  # name.dataset <- names.datasets[[1]]
+  
+  d <- NULL
+  for(name.dataset in names.datasets){
+    dd <- l %>% filter(`dataset name` == name.dataset)
+    d <- d %>% rbind(my.little.align(dd))
+  }
+  
+  d %>% return()
+}
 
 

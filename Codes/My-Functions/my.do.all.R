@@ -2,7 +2,7 @@ my.do.all <- function(technique){
   
 # reading appropriate samples ---------------------------------------------
   
-  technique <- "r.randocc"
+  # technique <- "r.randocc"
   
   path.to.processed <- "correct_processed-457_May22/"
   
@@ -47,6 +47,7 @@ my.do.all <- function(technique){
   (Sys.time() - t) %>% print()
   
   
+# plotting the spaghetti plots to spot fantom bimodality ------------------
   
   t <- Sys.time()
   for(name in list.of.names){

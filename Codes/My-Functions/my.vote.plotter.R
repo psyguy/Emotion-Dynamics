@@ -1,6 +1,10 @@
 # my.vote.plotter <- function(f, criterion = "AICc", sample.name = ""){
 
+<<<<<<< HEAD
+  i <- 1
+=======
   i <- 5
+>>>>>>> master
   criterion <- criterion.list[i]
   sample.name <- technique
   ft <- f %>% group_by_("`dataset name`", criterion) %>% dplyr::summarise(freq=n()) %>% arrange(`dataset name`)

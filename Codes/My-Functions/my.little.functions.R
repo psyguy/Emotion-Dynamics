@@ -123,7 +123,6 @@ my.loading.extractor <- function(sampled.path,
 
 
 # correcting colnames, item names, dropping the three datasets ------------
-# correcting col names, item names, removing the 3 datasets ---------------
 
 quick.correct <- function(x, is.loading = FALSE, dropped.data.set = "TGC"){
   colnames(x)[1:2] <- c("dataset name", "model definition")
@@ -131,8 +130,9 @@ quick.correct <- function(x, is.loading = FALSE, dropped.data.set = "TGC"){
     x$item <- x$item %>% toupper()
     x$item[x$item == "STRESS"] <- "STRESSED"
     x$item[x$item == "ANGER"] <- "ANGRY"
+    x[is.na(x)] <- 0
     x[x == 0] <- -10
-    }
+  }
   
   if(dropped.data.set == "TGC"){
     dropped.data.set <- c('MDD BPD TRULL', 'MDD GOTLIB', 'Cogito')
@@ -203,15 +203,17 @@ my.spaghetti.ploter <- function(d, name.dataset, wbp){
 
 my.little.align <- function(d){
   
+  d[is.na(d)] <- 0
   items <- d$item %>% unique()
   factors <- colnames(d)[5:(ncol(d)-1)]
   d$seed <- d$seed %>% as.character() %>% as.numeric()
+  seeds <- d$seed %>% unique()
   new.fac.loadings.all <- c()
   for(n.f in 1:length(factors)){
     # d.new <- d %>% pull(f) %>% as.character() %>% as.numeric()
     f <- 4 + n.f
     new.fac.loadings <- c()
-    for(s in 1:100){
+    for(s in seeds){
       fac.loadings <- d %>% filter(seed == s) %>%
         pull(f) %>% as.character() %>% as.numeric()
       first.sign <- (fac.loadings[fac.loadings!=0])[1] %>% sign()
@@ -235,6 +237,7 @@ my.loading.aligner <- function(l){
   d <- NULL
   for(name.dataset in names.datasets){
     dd <- l %>% filter(`dataset name` == name.dataset)
+    dd[is.na(dd)] <- 0
     d <- d %>% rbind(my.little.align(dd))
   }
   

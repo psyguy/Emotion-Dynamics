@@ -1,8 +1,9 @@
-my.vote.plotter <- function(f, criterion = "AICc", sample.name = ""){
-  
-  # criterion <- criterion.list[6]
-  # sample.name <- technique
-  ft <- f %>% group_by(`dataset name`, AICc) %>% dplyr::summarise(freq=n()) %>% arrange(`dataset name`)
+# my.vote.plotter <- function(f, criterion = "AICc", sample.name = ""){
+
+  i <- 5
+  criterion <- criterion.list[i]
+  sample.name <- technique
+  ft <- f %>% group_by_("`dataset name`", criterion) %>% dplyr::summarise(freq=n()) %>% arrange(`dataset name`)
 
   Frequency <- ft$freq
   Dataset <- ft$`dataset name`
@@ -24,4 +25,4 @@ my.vote.plotter <- function(f, criterion = "AICc", sample.name = ""){
   dev.off()
 
     
-}
+# }

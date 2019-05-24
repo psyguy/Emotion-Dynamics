@@ -81,6 +81,7 @@ my.density.heatmap.plotter <- function(l, which = "h2", cluster.what = c("items"
   d.wide <- d.long %>% spread(itemXdataset, to.be.plotted) %>% select(-seed)
   
   d.wide[is.na(d.wide)] <- -10
+  d.wide[d.wide==0] <- -10
   
 # plotting the density heatmap ------------------------------------------
   
@@ -93,7 +94,8 @@ my.density.heatmap.plotter <- function(l, which = "h2", cluster.what = c("items"
   
   # file.name <- paste(which, "png", sep = ".")
   
-  file.name <- paste(names(l), which, cluster.what, "png", sep = ".")
+  # file.name <- paste(names(l), which, cluster.what, "png", sep = ".")
+  file.name <- paste(which, "png", sep = ".")
   file.name %>% png(width = hm.width, height = hm.height)
   
   hm <- d.wide %>% densityHeatmap(show_column_names = FALSE,

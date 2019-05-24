@@ -2,7 +2,7 @@ my.do.all <- function(technique){
   
 # reading appropriate samples ---------------------------------------------
   
-  # technique <- "r.sameocc"
+  technique <- "r.randocc"
   
   path.to.processed <- "correct_processed-457_May22/"
   
@@ -20,12 +20,16 @@ my.do.all <- function(technique){
                         'PETEMADDY')
   
   ## remove comments, it works
+  
   f <- sampled.path %>% my.fit.extractor() %>%
                           quick.correct(is.loading = FALSE)
+  save(list = c("f"), file = paste0(technique,"_fits.RData"))
+
+    
   l <- sampled.path %>% my.loading.extractor() %>%
                           llply(quick.correct, is.loading = TRUE) %>%
                           llply(my.loading.aligner)
-  save(list = c("f","l"), file = paste0(technique,"_loadings.and.factors.RData"))
+  save(list = c("l"), file = paste0(technique,"_loadings.RData"))
 
   
   
@@ -50,6 +54,15 @@ my.do.all <- function(technique){
     print(paste("Spaghetti of", name, technique, "is plotted"))
   }
   (Sys.time() - t) %>% print()
+  
+  ## doesn't work as function
+  # criterion.list <- c("AIC", "AICc", "SABIC", "HQ", "BIC", "logLik")
+  # t <- Sys.time()
+  # for(c in criterion.list){
+  #   f %>% my.vote.plotter(c, technique)
+  #   print(paste("Votes of", c, technique, "is plotted"))
+  # }
+  # (Sys.time() - t) %>% print()
 
 }
 
